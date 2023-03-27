@@ -18,6 +18,7 @@ from openwisp_utils.base import KeyField
 from ...base import ShareableOrgMixinUniqueName
 from .. import crypto
 from .. import settings as app_settings
+from ..api.zerotier_central_api import ZerotierCentralAPI
 from ..signals import vpn_peers_changed, vpn_server_modified
 from ..tasks import create_vpn_dh, trigger_vpn_server_endpoint
 from .base import BaseConfig
@@ -90,7 +91,9 @@ class AbstractVpn(ShareableOrgMixinUniqueName, BaseConfig):
     )
     auth_token = models.CharField(
         verbose_name=_('Webhook AuthToken'),
-        help_text=_('Authentication token for triggering "Webhook Endpoint"'),
+        help_text=_(
+            'Authentication token used for triggering "Webhook Endpoint" or calling "ZerotierCentralAPI"'  # noqa
+        ),
         max_length=128,
         blank=True,
         null=True,
@@ -195,6 +198,24 @@ class AbstractVpn(ShareableOrgMixinUniqueName, BaseConfig):
         if not created:
             self._check_changes()
         create_dh = False
+        if self._is_backend_type('zerotier'):
+            if not self.auth_token:
+                raise ValidationError(
+                    {'auth_token': _('Zerotier auth token is required')}
+                )
+            if self.config.get('id', None) is None:
+                response = ZerotierCentralAPI(
+                    self.host, self.auth_token
+                ).create_network(self.name)
+                config = response.get('config')
+                data = {
+                    'name': config.get('name'),
+                    'id': config.get('id'),
+                    'enableBroadCast': config.get('enableBroadCast'),
+                    'creationTime': config.get('creationTime'),
+                }
+                # Append new zerotier controller config data
+                self.config = {**self.config, 'zerotier': [data]}
         if not self.cert and self.ca:
             self.cert = self._auto_create_cert()
         if self._is_backend_type('openvpn') and not self.dh:
@@ -261,6 +282,19 @@ class AbstractVpn(ShareableOrgMixinUniqueName, BaseConfig):
                 f'Cannot update configuration of {instance.name} VPN server, '
                 'webhook endpoint and authentication token are empty.'
             )
+
+    @classmethod
+    def post_delete(cls, instance, **kwargs):
+        """
+        class method for ``post_delete`` signal
+        for managing automatic deletion of vpn servers
+        """
+        if not instance._is_backend_type('zerotier'):
+            return
+        network_id = instance.config.get('zerotier')[0].get('id')
+        ZerotierCentralAPI(instance.host, instance.auth_token).delete_network(
+            network_id
+        )
 
     def _auto_create_cert(self):
         """
@@ -444,6 +478,13 @@ class AbstractVpn(ShareableOrgMixinUniqueName, BaseConfig):
                 auto = getattr(template_backend_class, vpn_auto_client)(
                     host=vpn_host,
                     server=self.config['wireguard'][0],
+                    **context_keys,
+                )
+            # If backend is 'zerotier' than auto_client and update the config
+            elif self._is_backend_type('zerotier') and template_backend_class:
+                auto = backend.auto_client(
+                    host=self.host,
+                    server=self.config[config_dict_key][0],
                     **context_keys,
                 )
             else:
