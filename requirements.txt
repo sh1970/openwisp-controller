@@ -2,7 +2,7 @@ django-sortedm2m~=3.1.1
 django-reversion~=4.0.1
 django-taggit~=2.1.0
 # For prototype
-netjsonconfig @ https://github.com/openwisp/netjsonconfig/tarball/issue-208/add-zerotier-backend
+netjsonconfig @ https://github.com/openwisp/netjsonconfig/tarball/issue-207/add-zerotier-to-openwrt-backend
 django-x509 @ https://github.com/openwisp/django-x509/tarball/master
 django-loci @ https://github.com/openwisp/django-loci/tarball/master
 django-flat-json-widget @ https://github.com/openwisp/django-flat-json-widget/tarball/master

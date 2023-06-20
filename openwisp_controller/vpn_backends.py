@@ -58,7 +58,7 @@ wireguard_properties['items']['required'].remove('private_key')
 
 limited_zerotier_schema = deepcopy(BaseZeroTier.schema)
 zerotier_properties = limited_zerotier_schema['properties']['zerotier']
-zerotier_properties.update({'additionalItems': False,'maxItems': 1, 'minItems': 1})
+zerotier_properties.update({'additionalItems': False, 'maxItems': 1, 'minItems': 1})
 # zerotier server mode only
 zerotier_properties['items'].update(
     {
@@ -67,6 +67,7 @@ zerotier_properties['items'].update(
         ]
     }
 )
+
 
 class Wireguard(BaseWireguard):
     """
