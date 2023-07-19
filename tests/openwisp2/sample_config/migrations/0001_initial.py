@@ -456,7 +456,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'VPN client',
                 'verbose_name_plural': 'VPN clients',
                 'abstract': False,
-                'unique_together': {('vpn', 'vni'), ('config', 'vpn')},
+                'unique_together': {('config', 'vpn')},
             },
         ),
         migrations.CreateModel(
@@ -738,6 +738,26 @@ class Migration(migrations.Migration):
                         default=dict,
                         dump_kwargs={'ensure_ascii': False, 'indent': 4},
                         load_kwargs={'object_pairs_hook': collections.OrderedDict},
+                        help_text=(
+                            'Group meta data, use this field to store data which is'
+                            ' related to this group and can be retrieved via the'
+                            ' REST API.'
+                        ),
+                        verbose_name='Metadata',
+                    ),
+                ),
+                (
+                    'context',
+                    jsonfield.fields.JSONField(
+                        blank=True,
+                        default=dict,
+                        dump_kwargs={'ensure_ascii': False, 'indent': 4},
+                        help_text=(
+                            'This field can be used to add meta data for the group'
+                            ' or to add "Configuration Variables" to the devices.'
+                        ),
+                        load_kwargs={'object_pairs_hook': collections.OrderedDict},
+                        verbose_name='Configuration Variables',
                     ),
                 ),
                 (
