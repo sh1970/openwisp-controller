@@ -149,7 +149,7 @@ def reverse(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('config', '0047_add_organizationlimits'),
+        ('config', '0050_alter_vpnclient_unique_together'),
     ]
 
     operations = [migrations.RunPython(forward, reverse_code=reverse)]

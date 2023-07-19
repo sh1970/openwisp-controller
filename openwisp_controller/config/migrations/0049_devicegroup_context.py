@@ -9,7 +9,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('config', '0048_wifi_radio_band_migration'),
+        ('config', '0048_vpn_node_network_id'),
     ]
 
     operations = [
