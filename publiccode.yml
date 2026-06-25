@@ -2,8 +2,7 @@
 # metadata file that makes public software easily discoverable.
 # More info at https://github.com/italia/publiccode.yml
 
-# The file follows publiccode.yml 0.7, which introduced the supports field.
-publiccodeYmlVersion: "0.7"
+publiccodeYmlVersion: "0.5"
 name: OpenWISP Controller
 url: "https://github.com/openwisp/openwisp-controller"
 applicationSuite: OpenWISP
