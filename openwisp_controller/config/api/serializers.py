@@ -41,6 +41,7 @@ class TemplateSerializer(BaseSerializer):
             "tags",
             "default",
             "required",
+            "notes",
             "default_values",
             "config",
             "created",
